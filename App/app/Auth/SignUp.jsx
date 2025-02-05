@@ -2,6 +2,8 @@ import {Image,View , Text,TextInput, StyleSheet, TouchableOpacity, Pressable} fr
 import React from 'react'
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { db } from '../../config/firebaseConfig';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function SignUp(){
     const router=useRouter();
@@ -11,12 +13,29 @@ export default function SignUp(){
 
     const CreateNewAccount=()=>{
         createUserWithEmailAndPassword(auth,email,password)
-        .then(resp=>{
+        .then(async(resp)=>{
             const user =resp.user;
             console.log(user)
+            await SaveUser(user);
             //Save user to Database
 
         })
+        .catch(e=>{
+            console.log(e.message)
+        })
+
+    }
+
+    const  SaveUser=async()=>{
+        await setDoc(doc(db,'users',email),{
+            name:fulName,
+            email:email,
+            member:false,
+            uid:user?.uid
+
+        })
+
+        //Navigate to New Screen
 
     }
     return(
